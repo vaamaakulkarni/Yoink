@@ -22,6 +22,19 @@ export type Offer = {
   expires_at: string
 }
 
+export type ConversationInfo = {
+  buyerId: string
+  sellerId: string
+  buyerName: string
+  sellerName: string
+  listingTitle: string
+  listingImage: string | null
+}
+
+export function useConversation(conversationId: string | null) {
+  const [messages, setMessages] = useState<Message[]>([])
+  const [offers, setOffers] = useState<Record<string, Offer>>({})
+  const [conversation, setConversation] = useState<ConversationInfo | null>(null)
 export function useConversation(conversationId: string | null) {
   const [messages, setMessages] = useState<Message[]>([])
   const [offers, setOffers] = useState<Record<string, Offer>>({})
@@ -51,6 +64,38 @@ export function useConversation(conversationId: string | null) {
   }, [conversationId])
 
   useEffect(() => { load() }, [load])
+
+  useEffect(() => {
+    if (!conversationId) return
+    supabase
+      .from('conversations')
+      .select(`
+        buyer_id, seller_id,
+        buyer:profiles!conversations_buyer_id_fkey(name),
+        seller:profiles!conversations_seller_id_fkey(name),
+        listings ( title, image_url )
+      `)
+      .eq('id', conversationId)
+      .single()
+      .then(({ data }) => {
+        if (!data) return
+        const row = data as unknown as {
+          buyer_id: string
+          seller_id: string
+          buyer: { name: string } | null
+          seller: { name: string } | null
+          listings: { title: string; image_url: string | null } | null
+        }
+        setConversation({
+          buyerId: row.buyer_id,
+          sellerId: row.seller_id,
+          buyerName: row.buyer?.name ?? 'Buyer',
+          sellerName: row.seller?.name ?? 'Seller',
+          listingTitle: row.listings?.title ?? 'Listing',
+          listingImage: row.listings?.image_url ?? null,
+        })
+      })
+  }, [conversationId])
 
   useEffect(() => {
     if (!conversationId) return
@@ -106,5 +151,6 @@ export function useConversation(conversationId: string | null) {
       if (error) throw new Error(error.message)
     }, [])
 
+  return { messages, offers, conversation, userId, loading, sendMessage, respondToOffer, reload: load }
   return { messages, offers, userId, loading, sendMessage, respondToOffer, reload: load }
 }

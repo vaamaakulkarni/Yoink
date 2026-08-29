@@ -8,7 +8,8 @@ import { Filters } from './FilterSheet'
 export function useListings(
   category: string,
   search: string,
-  filters: Filters
+  filters: Filters,
+  activeDorm: string | null
 ) {
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
@@ -16,6 +17,10 @@ export function useListings(
   useEffect(() => {
     const supabase = createClient()
     let query = supabase.from('listings').select('*')
+
+    if (activeDorm) {
+      query = query.eq('dorm', activeDorm)
+    }
 
     if (category === 'Free') {
       query = query.eq('is_free', true)
@@ -54,7 +59,7 @@ export function useListings(
       }
       setLoading(false)
     })
-  }, [category, search, filters])
+  }, [category, search, filters, activeDorm])
 
   return { listings, loading }
 }
