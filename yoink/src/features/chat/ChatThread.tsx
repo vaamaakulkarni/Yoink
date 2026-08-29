@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useConversation, type Offer } from './useConversation'
 
 function timeLeft(expiresAt: string) {
@@ -72,7 +73,7 @@ function OfferCard({
 }
 
 export default function ChatThread({ conversationId }: { conversationId: string }) {
-  const { messages, offers, userId, loading, sendMessage, respondToOffer } =
+  const { messages, offers, conversation, userId, loading, sendMessage, respondToOffer } =
     useConversation(conversationId)
   const [draft, setDraft] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -82,6 +83,12 @@ export default function ChatThread({ conversationId }: { conversationId: string 
   }, [messages.length])
 
   if (loading) return <p className="p-6 text-[#8A8578]">Loading…</p>
+
+  const otherName = conversation
+    ? conversation.sellerId === userId
+      ? conversation.buyerName
+      : conversation.sellerName
+    : 'Chat'
 
   const send = async () => {
     const body = draft
@@ -95,6 +102,17 @@ export default function ChatThread({ conversationId }: { conversationId: string 
 
   return (
     <div className="flex flex-col h-[80vh] max-w-2xl mx-auto">
+      <div className="flex items-center gap-3 p-4 border-b-2 border-[#EFE6D8]">
+        <Link
+          href="/chat"
+          aria-label="Back to chats"
+          className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-[#EFE6D8] bg-white text-lg hover:border-[#FF5A1F] transition-colors"
+        >
+          ←
+        </Link>
+        <p className="font-display font-bold text-[#1A1A1A]">{otherName}</p>
+      </div>
+
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.map(m => {
           if (m.kind === 'system') {

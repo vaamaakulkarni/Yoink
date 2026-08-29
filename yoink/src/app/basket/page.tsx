@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
 interface Listing {
@@ -57,17 +58,35 @@ export default function BasketPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center p-6 text-center">
-        <p className="text-xl font-semibold text-gray-700">
-          Your basket&apos;s empty — go find some free drip.
-        </p>
+      <div className="min-h-[60vh] flex flex-col p-6">
+        <Link
+          href="/feed"
+          aria-label="Back to feed"
+          className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-[#EFE6D8] bg-white text-lg hover:border-[#FF5A1F] transition-colors"
+        >
+          ←
+        </Link>
+        <div className="flex-1 flex items-center justify-center text-center">
+          <p className="text-xl font-semibold text-gray-700">
+            Your basket&apos;s empty — go find some free drip.
+          </p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Your Basket</h1>
+      <div className="flex items-center gap-3">
+        <Link
+          href="/feed"
+          aria-label="Back to feed"
+          className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-[#EFE6D8] bg-white text-lg hover:border-[#FF5A1F] transition-colors"
+        >
+          ←
+        </Link>
+        <h1 className="text-2xl font-bold">Your Basket</h1>
+      </div>
       <div className="space-y-4">
         {items.map((entry) => {
           const item = Array.isArray(entry.listings) ? entry.listings[0] : entry.listings

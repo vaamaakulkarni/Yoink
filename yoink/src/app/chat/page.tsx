@@ -42,16 +42,34 @@ export default function ChatListPage() {
 
   if (!rows.length) {
     return (
-      <div className="p-10 text-center text-[#8A8578]">
-        <p className="text-4xl mb-3">💬</p>
-        <p className="font-medium">No chats yet — make an offer to start one.</p>
+      <div className="max-w-2xl mx-auto p-4">
+        <Link
+          href="/feed"
+          aria-label="Back to feed"
+          className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-[#EFE6D8] bg-white text-lg hover:border-[#FF5A1F] transition-colors"
+        >
+          ←
+        </Link>
+        <div className="p-10 text-center text-[#8A8578]">
+          <p className="text-4xl mb-3">💬</p>
+          <p className="font-medium">No chats yet — make an offer to start one.</p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-2">
-      <h1 className="font-display text-2xl font-bold text-[#1A1A1A] mb-4">Chats</h1>
+      <div className="flex items-center gap-3 mb-4">
+        <Link
+          href="/feed"
+          aria-label="Back to feed"
+          className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-[#EFE6D8] bg-white text-lg hover:border-[#FF5A1F] transition-colors"
+        >
+          ←
+        </Link>
+        <h1 className="font-display text-2xl font-bold text-[#1A1A1A]">Chats</h1>
+      </div>
 
       {rows.map(c => {
         const last = [...(c.messages ?? [])]

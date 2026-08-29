@@ -22,9 +22,17 @@ export type Offer = {
   expires_at: string
 }
 
+export type ConversationInfo = {
+  buyerId: string
+  sellerId: string
+  buyerName: string
+  sellerName: string
+}
+
 export function useConversation(conversationId: string | null) {
   const [messages, setMessages] = useState<Message[]>([])
   const [offers, setOffers] = useState<Record<string, Offer>>({})
+  const [conversation, setConversation] = useState<ConversationInfo | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -51,6 +59,34 @@ export function useConversation(conversationId: string | null) {
   }, [conversationId])
 
   useEffect(() => { load() }, [load])
+
+  useEffect(() => {
+    if (!conversationId) return
+    supabase
+      .from('conversations')
+      .select(`
+        buyer_id, seller_id,
+        buyer:profiles!conversations_buyer_id_fkey(name),
+        seller:profiles!conversations_seller_id_fkey(name)
+      `)
+      .eq('id', conversationId)
+      .single()
+      .then(({ data }) => {
+        if (!data) return
+        const row = data as unknown as {
+          buyer_id: string
+          seller_id: string
+          buyer: { name: string } | null
+          seller: { name: string } | null
+        }
+        setConversation({
+          buyerId: row.buyer_id,
+          sellerId: row.seller_id,
+          buyerName: row.buyer?.name ?? 'Buyer',
+          sellerName: row.seller?.name ?? 'Seller',
+        })
+      })
+  }, [conversationId])
 
   useEffect(() => {
     if (!conversationId) return
@@ -106,5 +142,5 @@ export function useConversation(conversationId: string | null) {
       if (error) throw new Error(error.message)
     }, [])
 
-  return { messages, offers, userId, loading, sendMessage, respondToOffer, reload: load }
+  return { messages, offers, conversation, userId, loading, sendMessage, respondToOffer, reload: load }
 }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 const CATEGORIES = ['Kitchenware', 'Winter Needs', 'Clothing', 'All']
 const CONDITIONS = ['Like New', 'Good', 'Well Loved']
@@ -60,6 +61,16 @@ export default function SellUploadPage() {
 
   return (
     <main className="min-h-screen bg-[#FFF8F0] flex flex-col items-center px-6 py-10">
+      <div className="w-full max-w-xs mb-4">
+        <Link
+          href="/feed"
+          aria-label="Back to feed"
+          className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-[#EFE6D8] bg-white text-lg hover:border-[#FF5A1F] transition-colors"
+        >
+          ←
+        </Link>
+      </div>
+
       <h1 className="font-display text-2xl font-bold text-[#1A1A1A] mb-1">
         Got something to Yoink?
       </h1>
