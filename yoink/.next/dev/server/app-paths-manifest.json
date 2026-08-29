@@ -2,7 +2,10 @@
   "/(auth)/login/page": "app/(auth)/login/page.js",
   "/(auth)/signup/page": "app/(auth)/signup/page.js",
   "/(auth)/welcome/page": "app/(auth)/welcome/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/feed/page": "app/feed/page.js",
+  "/page": "app/page.js",
+  "/sell/page": "app/sell/page.js"
   "/item/[id]/page": "app/item/[id]/page.js",
   "/page": "app/page.js"
 }
