@@ -32,10 +32,10 @@ export default function AddToBasketButton({ listingId, buyerId }: AddToBasketBut
     <button
       onClick={handleAddToBasket}
       disabled={loading || added}
-      className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 ${
+      className={`w-full py-3 rounded-2xl font-display font-bold transition-all duration-200 ${
         added
-          ? 'bg-emerald-600 text-white scale-105'
-          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+          ? 'bg-[#00C2A8] text-white scale-105'
+          : 'bg-[#FFE8D6] text-[#8A5A3A] hover:bg-[#FFDCC0]'
       }`}
     >
       {loading ? 'Adding...' : added ? '✓ Added to Basket!' : 'Add to Basket'}
