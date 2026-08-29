@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 
 interface OfferSheetProps {
   item: {
@@ -16,6 +17,7 @@ interface OfferSheetProps {
 }
 
 export default function OfferSheet({ item, buyerId, buyerName, onClose }: OfferSheetProps) {
+  const router = useRouter()
   const [offerAmount, setOfferAmount] = useState<number | string>(item.price)
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -26,41 +28,23 @@ export default function OfferSheet({ item, buyerId, buyerName, onClose }: OfferS
   }
 
   const handleSubmit = async () => {
-    setLoading(true)
-    const numericAmount = Number(offerAmount)
+  setLoading(true)
+  const numericAmount = Number(offerAmount)
 
-    const { data: matchData, error: matchError } = await supabase
-      .from('matches')
-      .insert({
-        listing_id: item.id,
-        buyer_id: buyerId,
-        seller_id: item.seller_id,
-        offer_amount: numericAmount,
-        status: 'pending',
-      })
-      .select()
-      .single()
+  const { data, error } = await supabase.rpc('make_offer', {
+    p_listing_id: item.id,
+    p_amount: numericAmount,
+  })
 
-    if (matchError || !matchData) {
-      alert('Error making offer: ' + matchError?.message)
-      setLoading(false)
-      return
-    }
+  setLoading(false)
 
-    const offerMessage = `${buyerName} offered $${numericAmount} for this. Accept, counter, or decline?`
-    const { error: msgError } = await supabase.from('messages').insert({
-      match_id: matchData.id,
-      sender_id: buyerId,
-      content: offerMessage,
-    })
-
-    setLoading(false)
-    if (!msgError) {
-      setSubmitted(true)
-    } else {
-      alert('Offer created, but failed to post message: ' + msgError.message)
-    }
+  if (error) {
+    alert(error.message)
+    return
   }
+
+  router.push(`/chat/${data.conversation_id}`)
+}
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center p-4 z-50">

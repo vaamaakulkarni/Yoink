@@ -4,6 +4,7 @@ export type Filters = {
   maxPrice: number
   sortBy: 'newest' | 'price_low' | 'price_high'
   yoinkStatus: 'all' | 'first' | 'reyoink'
+  dormOverride: string | null
 }
 
 export function FilterSheet({
