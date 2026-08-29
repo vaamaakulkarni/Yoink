@@ -8,6 +8,7 @@ type Draft = {
   category: string
   condition: string
   ai_tag: string | null
+  condition_score: number | null
   photoPreview: string
 }
 
