@@ -35,6 +35,9 @@ export function useConversation(conversationId: string | null) {
   const [messages, setMessages] = useState<Message[]>([])
   const [offers, setOffers] = useState<Record<string, Offer>>({})
   const [conversation, setConversation] = useState<ConversationInfo | null>(null)
+export function useConversation(conversationId: string | null) {
+  const [messages, setMessages] = useState<Message[]>([])
+  const [offers, setOffers] = useState<Record<string, Offer>>({})
   const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -149,4 +152,5 @@ export function useConversation(conversationId: string | null) {
     }, [])
 
   return { messages, offers, conversation, userId, loading, sendMessage, respondToOffer, reload: load }
+  return { messages, offers, userId, loading, sendMessage, respondToOffer, reload: load }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
@@ -48,6 +49,7 @@ export default function ChatListPage() {
           offers ( status, amount, created_at ),
           buyer:profiles!conversations_buyer_id_fkey(name),
           seller:profiles!conversations_seller_id_fkey(name)
+          messages ( body, created_at, kind )
         `)
         .order('created_at', { ascending: false })
 
@@ -86,6 +88,13 @@ export default function ChatListPage() {
           <p className="text-4xl mb-3">💬</p>
           <p className="font-medium">No chats yet — make an offer to start one.</p>
         </div>
+  if (loading) return <p className="p-6 text-[#8A8578]">Loading…</p>
+
+  if (!rows.length) {
+    return (
+      <div className="p-10 text-center text-[#8A8578]">
+        <p className="text-4xl mb-3">💬</p>
+        <p className="font-medium">No chats yet — make an offer to start one.</p>
       </div>
     )
   }
@@ -174,6 +183,44 @@ export default function ChatListPage() {
         <p className="font-display font-bold text-sm text-ink">Nothing else on the go</p>
         <p className="text-xs text-muted mt-1">Chats start when you make an offer 👀</p>
       </div>
+    </div>
+  )
+}
+    <div className="max-w-2xl mx-auto p-4 space-y-2">
+      <h1 className="font-display text-2xl font-bold text-[#1A1A1A] mb-4">Chats</h1>
+
+      {rows.map(c => {
+        const last = [...(c.messages ?? [])]
+          .sort((a, b) => a.created_at.localeCompare(b.created_at))
+          .pop()
+        const role = c.seller_id === userId ? 'Selling' : 'Buying'
+
+        return (
+          <Link
+            key={c.id}
+            href={`/chat/${c.id}`}
+            className="flex gap-3 items-center p-3 bg-white rounded-2xl border-2 border-[#EFE6D8] hover:border-[#FF5A1F] transition-colors"
+          >
+            <div className="w-14 h-14 rounded-xl bg-[#F5F0E8] shrink-0 overflow-hidden">
+              {c.listings?.image_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={c.listings.image_url} alt="" className="w-full h-full object-cover" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex justify-between items-baseline gap-2">
+                <p className="font-display font-bold text-[#1A1A1A] truncate">
+                  {c.listings?.title ?? 'Listing'}
+                </p>
+                <span className="text-[10px] font-bold text-[#8A8578] shrink-0">{role}</span>
+              </div>
+              <p className="text-sm text-[#8A8578] truncate">
+                {last?.body ?? 'No messages yet'}
+              </p>
+            </div>
+          </Link>
+        )
+      })}
     </div>
   )
 }

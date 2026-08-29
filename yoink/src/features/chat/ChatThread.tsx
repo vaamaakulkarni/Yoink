@@ -6,6 +6,8 @@ import { useConversation, type Offer } from './useConversation'
 
 const QUICK_REPLIES = ['Still available?', 'New offer']
 
+import { useConversation, type Offer } from './useConversation'
+
 function timeLeft(expiresAt: string) {
   const ms = new Date(expiresAt).getTime() - Date.now()
   if (ms <= 0) return 'expired'
@@ -34,11 +36,14 @@ function OfferCard({
     <div className="border-2 border-line rounded-[18px] p-4 bg-white text-center min-w-[190px] max-w-sm">
       <p className="font-mono text-[10px] tracking-[.08em] text-faint">OFFER</p>
       <p className="font-display text-2xl font-extrabold tracking-[-.03em] text-ink mt-0.5">
+    <div className="border-2 border-[#EFE6D8] rounded-2xl p-4 bg-white max-w-sm">
+      <p className="text-2xl font-bold text-[#1A1A1A]">
         ${Number(offer.amount).toFixed(2)}
       </p>
 
       {live && (
         <p className="text-xs text-muted mt-1">
+        <p className="text-xs text-[#8A8578] mt-1">
           {timeLeft(offer.expires_at)}
         </p>
       )}
@@ -48,12 +53,14 @@ function OfferCard({
           <button
             onClick={() => onRespond('accept')}
             className="flex-1 py-2 bg-mint text-white rounded-xl font-display font-bold text-sm"
+            className="flex-1 py-2 bg-[#00C2A8] text-white rounded-xl font-bold text-sm"
           >
             Accept
           </button>
           <button
             onClick={() => onRespond('decline')}
             className="flex-1 py-2 border-2 border-line rounded-xl font-display font-bold text-sm"
+            className="flex-1 py-2 border-2 border-[#EFE6D8] rounded-xl font-bold text-sm"
           >
             Decline
           </button>
@@ -75,6 +82,14 @@ function OfferCard({
           {(offer.status === 'expired' || (offer.status === 'pending' && expired)) && (
             <span className="bg-peach text-cocoa rounded-full px-2.5 py-1">⏰ Expired</span>
           )}
+        <p className="text-xs text-[#8A8578] mt-2">Waiting on the seller…</p>
+      )}
+
+      {!live && (
+        <p className="text-sm font-semibold mt-2 text-[#8A8578]">
+          {offer.status === 'accepted' && '✅ Accepted'}
+          {offer.status === 'declined' && '❌ Declined'}
+          {(offer.status === 'expired' || (offer.status === 'pending' && expired)) && '⏰ Expired'}
         </p>
       )}
     </div>
@@ -83,6 +98,7 @@ function OfferCard({
 
 export default function ChatThread({ conversationId }: { conversationId: string }) {
   const { messages, offers, conversation, userId, loading, sendMessage, respondToOffer } =
+  const { messages, offers, userId, loading, sendMessage, respondToOffer } =
     useConversation(conversationId)
   const [draft, setDraft] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -99,6 +115,7 @@ export default function ChatThread({ conversationId }: { conversationId: string 
       : conversation.sellerName
     : 'Chat'
   const role = conversation && conversation.sellerId === userId ? 'Selling' : 'Buying'
+  if (loading) return <p className="p-6 text-[#8A8578]">Loading…</p>
 
   const send = async () => {
     const body = draft
@@ -139,6 +156,12 @@ export default function ChatThread({ conversationId }: { conversationId: string 
           if (m.kind === 'system') {
             return (
               <p key={m.id} className="text-center text-xs text-muted py-2">
+    <div className="flex flex-col h-[80vh] max-w-2xl mx-auto">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {messages.map(m => {
+          if (m.kind === 'system') {
+            return (
+              <p key={m.id} className="text-center text-xs text-[#8A8578] py-2">
                 {m.body}
               </p>
             )
@@ -148,6 +171,7 @@ export default function ChatThread({ conversationId }: { conversationId: string 
             const offer = offers[m.offer_id]
             return (
               <div key={m.id} className="self-center">
+              <div key={m.id} className={m.sender_id === userId ? 'ml-auto' : ''}>
                 <OfferCard
                   offer={offer}
                   isSeller={offer.seller_id === userId}
@@ -165,6 +189,8 @@ export default function ChatThread({ conversationId }: { conversationId: string 
                 mine
                   ? 'self-end rounded-[20px_20px_6px_20px] bg-orange text-white'
                   : 'self-start rounded-[20px_20px_20px_6px] bg-white border-2 border-line text-ink'
+              className={`max-w-xs px-4 py-2 rounded-2xl ${
+                mine ? 'ml-auto bg-[#FF5A1F] text-white' : 'bg-[#F5F0E8] text-[#1A1A1A]'
               }`}
             >
               {m.body}
@@ -201,6 +227,24 @@ export default function ChatThread({ conversationId }: { conversationId: string 
             Send
           </button>
         </div>
+      </div>
+    </div>
+  )
+}
+      <div className="flex gap-2 p-4 border-t-2 border-[#EFE6D8]">
+        <input
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') send() }}
+          placeholder="Message…"
+          className="flex-1 border-2 border-[#EFE6D8] rounded-xl px-4 py-2 outline-none focus:border-[#FF5A1F]"
+        />
+        <button
+          onClick={send}
+          className="px-5 bg-[#1A1A1A] text-white rounded-xl font-bold"
+        >
+          Send
+        </button>
       </div>
     </div>
   )
