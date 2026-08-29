@@ -33,14 +33,21 @@ export default function FeedPage() {
   return (
     <main className="min-h-screen bg-[#FFF8F0]">
       <div className="max-w-2xl mx-auto px-4 pb-8">
-        <div className="flex items-start justify-between pt-8 pb-2">
-          <div className="flex-1" />
-          <div className="flex-1 text-center">
+        <div className="grid grid-cols-3 items-start pt-8 pb-2">
+          <div className="flex items-center gap-2">
+            <Link
+              href="/basket"
+              className="flex items-center gap-1.5 rounded-full bg-white border-2 border-[#EFE6D8] text-[#1A1A1A] px-4 py-2 text-sm font-display font-bold hover:border-[#FF5A1F] transition-colors"
+            >
+              🧺 Basket
+            </Link>
+          </div>
+          <div className="text-center">
             <h1 className="font-display text-4xl font-bold tracking-tight text-[#1A1A1A]">
               Yoink<span className="text-[#FF5A1F]">.</span>
             </h1>
           </div>
-          <div className="flex-1 flex justify-end">
+          <div className="flex justify-end">
             <Link
               href="/sell"
               className="flex items-center gap-1.5 rounded-full bg-[#FF5A1F] text-white px-4 py-2 text-sm font-display font-bold hover:bg-[#E64A0F] transition-colors"
