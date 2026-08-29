@@ -47,7 +47,7 @@ export default function FeedPage() {
               Yoink<span className="text-[#FF5A1F]">.</span>
             </h1>
           </div>
-          <div className="flex-1 flex justify-end items-center gap-2">
+          <div className="flex justify-end items-center gap-2">
             <Link
               href="/chat"
               className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#EFE6D8] bg-white text-lg hover:border-[#FF5A1F] transition-colors"
@@ -55,7 +55,6 @@ export default function FeedPage() {
             >
               💬
             </Link>
-          <div className="flex justify-end">
             <Link
               href="/sell"
               className="flex items-center gap-1.5 rounded-full bg-[#FF5A1F] text-white px-4 py-2 text-sm font-display font-bold hover:bg-[#E64A0F] transition-colors"
