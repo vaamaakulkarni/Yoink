@@ -48,16 +48,16 @@ export default function OfferSheet({ item, buyerId, buyerName, onClose }: OfferS
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-t-3xl sm:rounded-3xl p-6 max-w-md w-full space-y-4 border-2 border-[#EFE6D8]">
+      <div className="bg-white rounded-t-3xl sm:rounded-3xl p-6 max-w-md w-full space-y-4 border-2 border-line">
         {submitted ? (
           <div className="text-center py-4 space-y-3">
-            <h3 className="text-xl font-display font-bold text-[#00C2A8]">Offer Sent! 🚀</h3>
-            <p className="text-[#8A8578] text-sm font-medium">
+            <h3 className="text-xl font-display font-bold text-mint">Offer Sent! 🚀</h3>
+            <p className="text-muted text-sm font-medium">
               We&apos;ve notified the seller of your offer.
             </p>
             <button
               onClick={onClose}
-              className="w-full py-2.5 bg-[#1A1A1A] text-white rounded-2xl font-display font-bold"
+              className="w-full py-2.5 bg-ink text-white rounded-2xl font-display font-bold"
             >
               Close
             </button>
@@ -65,52 +65,52 @@ export default function OfferSheet({ item, buyerId, buyerName, onClose }: OfferS
         ) : (
           <>
             <div>
-              <p className="text-sm text-[#8A8578] font-medium">Try your luck 👀</p>
-              <h2 className="text-xl font-display font-bold text-[#1A1A1A]">Make an Offer</h2>
+              <p className="text-sm text-muted font-medium">Try your luck 👀</p>
+              <h2 className="text-xl font-display font-bold text-ink">Make an Offer</h2>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={() => handleQuickDiscount(0.1)}
-                className="flex-1 py-2 bg-[#FFE8D6] hover:bg-[#FFDCC0] rounded-xl text-sm font-display font-semibold text-[#8A5A3A]"
+                className="flex-1 py-2 bg-peach hover:bg-[#FFDCC0] rounded-xl text-sm font-display font-semibold text-cocoa"
               >
                 10% off
               </button>
               <button
                 onClick={() => handleQuickDiscount(0.15)}
-                className="flex-1 py-2 bg-[#FFE8D6] hover:bg-[#FFDCC0] rounded-xl text-sm font-display font-semibold text-[#8A5A3A]"
+                className="flex-1 py-2 bg-peach hover:bg-[#FFDCC0] rounded-xl text-sm font-display font-semibold text-cocoa"
               >
                 15% off
               </button>
               <button
                 onClick={() => handleQuickDiscount(0.2)}
-                className="flex-1 py-2 bg-[#FFE8D6] hover:bg-[#FFDCC0] rounded-xl text-sm font-display font-semibold text-[#8A5A3A]"
+                className="flex-1 py-2 bg-peach hover:bg-[#FFDCC0] rounded-xl text-sm font-display font-semibold text-cocoa"
               >
                 20% off
               </button>
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-[#8A8578]">Custom Amount ($)</label>
+              <label className="text-xs font-semibold text-muted">Custom Amount ($)</label>
               <input
                 type="number"
                 value={offerAmount}
                 onChange={(e) => setOfferAmount(e.target.value)}
-                className="w-full border-2 border-[#EFE6D8] p-2.5 rounded-xl text-lg font-bold mt-1 outline-none focus:border-[#FF5A1F]"
+                className="w-full border-2 border-line p-2.5 rounded-xl text-lg font-bold mt-1 outline-none focus:border-orange"
               />
             </div>
 
             <div className="flex gap-2 pt-2">
               <button
                 onClick={onClose}
-                className="w-1/2 py-2.5 border-2 border-[#EFE6D8] rounded-2xl font-display font-bold text-[#1A1A1A]"
+                className="w-1/2 py-2.5 border-2 border-line rounded-2xl font-display font-bold text-ink"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="w-1/2 py-2.5 bg-[#FF5A1F] text-white rounded-2xl font-display font-bold hover:bg-[#E64A0F] disabled:opacity-50"
+                className="yk-shadow-orange w-1/2 py-2.5 bg-orange text-white rounded-2xl font-display font-bold transition-transform disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Send Offer'}
               </button>

@@ -27,6 +27,8 @@ export type ConversationInfo = {
   sellerId: string
   buyerName: string
   sellerName: string
+  listingTitle: string
+  listingImage: string | null
 }
 
 export function useConversation(conversationId: string | null) {
@@ -67,7 +69,8 @@ export function useConversation(conversationId: string | null) {
       .select(`
         buyer_id, seller_id,
         buyer:profiles!conversations_buyer_id_fkey(name),
-        seller:profiles!conversations_seller_id_fkey(name)
+        seller:profiles!conversations_seller_id_fkey(name),
+        listings ( title, image_url )
       `)
       .eq('id', conversationId)
       .single()
@@ -78,12 +81,15 @@ export function useConversation(conversationId: string | null) {
           seller_id: string
           buyer: { name: string } | null
           seller: { name: string } | null
+          listings: { title: string; image_url: string | null } | null
         }
         setConversation({
           buyerId: row.buyer_id,
           sellerId: row.seller_id,
           buyerName: row.buyer?.name ?? 'Buyer',
           sellerName: row.seller?.name ?? 'Seller',
+          listingTitle: row.listings?.title ?? 'Listing',
+          listingImage: row.listings?.image_url ?? null,
         })
       })
   }, [conversationId])

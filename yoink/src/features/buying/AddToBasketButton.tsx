@@ -6,9 +6,10 @@ import { supabase } from '@/lib/supabase'
 interface AddToBasketButtonProps {
   listingId: string
   buyerId: string
+  size?: number
 }
 
-export default function AddToBasketButton({ listingId, buyerId }: AddToBasketButtonProps) {
+export default function AddToBasketButton({ listingId, buyerId, size = 52 }: AddToBasketButtonProps) {
   const [added, setAdded] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -32,13 +33,15 @@ export default function AddToBasketButton({ listingId, buyerId }: AddToBasketBut
     <button
       onClick={handleAddToBasket}
       disabled={loading || added}
-      className={`w-full py-3 rounded-2xl font-display font-bold transition-all duration-200 ${
+      aria-label={added ? 'Added to basket' : 'Add to basket'}
+      style={{ width: size }}
+      className={`shrink-0 border-2 rounded-2xl flex items-center justify-center text-lg transition-colors ${
         added
-          ? 'bg-[#00C2A8] text-white scale-105'
-          : 'bg-[#FFE8D6] text-[#8A5A3A] hover:bg-[#FFDCC0]'
+          ? 'bg-mint border-mint text-white'
+          : 'bg-white border-line hover:border-orange disabled:opacity-60'
       }`}
     >
-      {loading ? 'Adding...' : added ? '✓ Added to Basket!' : 'Add to Basket'}
+      {added ? '✓' : '🧺'}
     </button>
   )
 }
