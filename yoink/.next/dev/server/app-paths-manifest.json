@@ -6,4 +6,6 @@
   "/feed/page": "app/feed/page.js",
   "/page": "app/page.js",
   "/sell/page": "app/sell/page.js"
+  "/item/[id]/page": "app/item/[id]/page.js",
+  "/page": "app/page.js"
 }

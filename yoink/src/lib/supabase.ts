@@ -6,3 +6,7 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 }
+
+// Ready-to-use singleton for components that just want `supabase.from(...)`
+// directly without calling createClient() themselves.
+export const supabase = createClient()
