@@ -11,6 +11,7 @@ import clip
 from PIL import Image
 from torchvision import transforms, models
 import torch.nn as nn
+from condition_estimation import classify_condition_discrete, score_condition_continuous
 
 RESNET_CHECKPOINT_PATH = "item_classifier_resnet18.pt"
 CONFIDENCE_THRESHOLD = 0.7  # set this based on train_resnet.py's confidence analysis output
@@ -72,25 +73,47 @@ def classify_with_clip(clip_model, clip_preprocess, image: Image.Image, categori
     return categories[top_idx.item()], top_prob.item()
 
 
+def estimate_condition(clip_model, clip_preprocess, image: Image.Image):
+    """Run condition estimation after item classification using the same CLIP model."""
+    discrete_label, discrete_confidence = classify_condition_discrete(
+        clip_model, clip_preprocess, image
+    )
+    continuous_score = score_condition_continuous(clip_model, clip_preprocess, image)
+
+    return {
+        "label": discrete_label,
+        "confidence": discrete_confidence,
+        "new_score": continuous_score,
+    }
+
+
 def classify_item(image_path: str, resnet_model, resnet_classes, clip_model, clip_preprocess):
+    """Classify an item, then estimate its condition from the same image."""
     image = Image.open(image_path)
 
     resnet_label, resnet_confidence = classify_with_resnet(resnet_model, resnet_classes, image)
 
     if resnet_confidence >= CONFIDENCE_THRESHOLD:
-        return {
+        classification = {
             "label": resnet_label,
             "confidence": resnet_confidence,
             "source": "resnet",
         }
+    else:
+        clip_label, clip_confidence = classify_with_clip(
+            clip_model, clip_preprocess, image, CLIP_FALLBACK_CATEGORIES
+        )
+        classification = {
+            "label": clip_label,
+            "confidence": clip_confidence,
+            "source": "clip_fallback",
+            "resnet_attempt": {"label": resnet_label, "confidence": resnet_confidence},
+        }
 
-    clip_label, clip_confidence = classify_with_clip(clip_model, clip_preprocess, image, CLIP_FALLBACK_CATEGORIES)
-    return {
-        "label": clip_label,
-        "confidence": clip_confidence,
-        "source": "clip_fallback",
-        "resnet_attempt": {"label": resnet_label, "confidence": resnet_confidence},
-    }
+    # This is deliberately after the classification branch so the pipeline order is
+    # always classification -> condition estimation, even when CLIP is the fallback.
+    classification["condition"] = estimate_condition(clip_model, clip_preprocess, image)
+    return classification
 
 
 def main():
@@ -100,10 +123,15 @@ def main():
     print("Ready.\n")
 
     # quick manual test - replace with your own image path
-    test_image_path = "test_item.jpg"
+    test_image_path = "test_images/backpack_1.jpeg"
     result = classify_item(test_image_path, resnet_model, resnet_classes, clip_model, clip_preprocess)
 
     print(f"Prediction: {result['label']} (confidence: {result['confidence']:.3f}, source: {result['source']})")
+    condition = result["condition"]
+    print(
+        f"Condition: {condition['label']} "
+        f"(confidence: {condition['confidence']:.3f}, new score: {condition['new_score']:.3f})"
+    )
     if result["source"] == "clip_fallback":
         attempt = result["resnet_attempt"]
         print(f"  (ResNet's best guess was '{attempt['label']}' at {attempt['confidence']:.3f}, below threshold)")

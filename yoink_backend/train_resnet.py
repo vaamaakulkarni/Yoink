@@ -15,7 +15,8 @@ from torchvision import datasets, transforms, models
 
 DATA_DIR = "data_sorted"
 BATCH_SIZE = 32
-EPOCHS = 10
+EPOCHS = 25  # raised since we now have early stopping to cut this short automatically
+EARLY_STOP_PATIENCE = 4  # stop if val accuracy doesn't improve for this many epochs
 LEARNING_RATE = 1e-3
 MODEL_OUT_PATH = "item_classifier_resnet18.pt"
 
@@ -55,8 +56,24 @@ num_features = model.fc.in_features
 model.fc = nn.Linear(num_features, len(class_names))
 model = model.to(device)
 
-criterion = nn.CrossEntropyLoss()
+# --- Item 1: class weighting to address imbalance (Fork: 77 vs Backpack: 198) ---
+from collections import Counter
+class_counts = Counter(train_dataset.targets)
+total_samples = sum(class_counts.values())
+class_weights = torch.tensor(
+    [total_samples / class_counts[i] for i in range(len(class_names))],
+    dtype=torch.float32,
+).to(device)
+print(f"Class weights (higher = rarer class, weighted more heavily in loss): "
+      f"{dict(zip(class_names, [round(w.item(), 2) for w in class_weights]))}")
+
+# --- Item 2: label smoothing to reduce overconfident wrong predictions ---
+criterion = nn.CrossEntropyLoss(weight=class_weights, label_smoothing=0.1)
+
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+
+# --- Item 3: learning rate scheduler, reduces LR when val accuracy plateaus ---
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", patience=2, factor=0.5)
 
 
 def run_epoch(loader, training: bool):
@@ -127,22 +144,34 @@ def analyze_confidence(loader):
 
 def main():
     best_val_acc = 0.0
+    patience_counter = 0
 
     for epoch in range(1, EPOCHS + 1):
         train_loss, train_acc = run_epoch(train_loader, training=True)
         val_loss, val_acc = run_epoch(val_loader, training=False)
 
+        current_lr = optimizer.param_groups[0]["lr"]
         print(f"Epoch {epoch}/{EPOCHS} | "
               f"train_loss={train_loss:.4f} train_acc={train_acc:.4f} | "
-              f"val_loss={val_loss:.4f} val_acc={val_acc:.4f}")
+              f"val_loss={val_loss:.4f} val_acc={val_acc:.4f} | lr={current_lr:.2e}")
+
+        # Item 3: scheduler checks val_acc and lowers LR if it's plateaued
+        scheduler.step(val_acc)
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
+            patience_counter = 0
             torch.save({
                 "model_state_dict": model.state_dict(),
                 "class_names": class_names,
             }, MODEL_OUT_PATH)
             print(f"  -> saved new best model ({val_acc:.4f}) to {MODEL_OUT_PATH}")
+        else:
+            # Item 4: early stopping if no improvement for EARLY_STOP_PATIENCE epochs
+            patience_counter += 1
+            if patience_counter >= EARLY_STOP_PATIENCE:
+                print(f"\nNo improvement for {EARLY_STOP_PATIENCE} epochs, stopping early at epoch {epoch}.")
+                break
 
     print(f"\nTraining complete. Best val accuracy: {best_val_acc:.4f}")
 
