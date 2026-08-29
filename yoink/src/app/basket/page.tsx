@@ -61,6 +61,7 @@ export default function BasketPage() {
               key={entry.id}
               className="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm"
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={item.image_url}
                 alt={item.title}
