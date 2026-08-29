@@ -21,20 +21,28 @@ export default function BasketPage() {
   const [items, setItems] = useState<BasketEntry[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function fetchBasket() {
-      const { data, error } = await supabase
-        .from('basket_items')
-        .select('id, listings(id, title, price, image_url, seller_name, ai_tag)')
+useEffect(() => {
+  async function fetchBasket() {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
 
-      if (!error && data) {
-        setItems(data as unknown as BasketEntry[])
-      }
+    if (!user) {
       setLoading(false)
+      return
     }
 
-    fetchBasket()
-  }, [])
+    const { data, error } = await supabase
+      .from('basket_items')
+      .select('id, listings(id, title, price, image_url, seller_name, ai_tag)')
+      .eq('buyer_id', user.id)
+
+    if (!error && data) {
+      setItems(data as unknown as BasketEntry[])
+    }
+    setLoading(false)
+  }
+  fetchBasket()
+}, [])
 
   if (loading) return <div className="p-8 text-center text-gray-500">Loading basket...</div>
 
