@@ -20,21 +20,38 @@ interface BasketEntry {
 export default function BasketPage() {
   const [items, setItems] = useState<BasketEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [removingId, setRemovingId] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchBasket() {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (!user) {
+        setLoading(false)
+        return
+      }
+
       const { data, error } = await supabase
         .from('basket_items')
         .select('id, listings(id, title, price, image_url, seller_name, ai_tag)')
+        .eq('buyer_id', user.id)
 
       if (!error && data) {
         setItems(data as unknown as BasketEntry[])
       }
       setLoading(false)
     }
-
     fetchBasket()
   }, [])
+
+  async function handleRemove(entryId: string) {
+    setRemovingId(entryId)
+    const { error } = await supabase.from('basket_items').delete().eq('id', entryId)
+    if (!error) {
+      setItems((prev) => prev.filter((entry) => entry.id !== entryId))
+    }
+    setRemovingId(null)
+  }
 
   if (loading) return <div className="p-8 text-center text-gray-500">Loading basket...</div>
 
@@ -81,6 +98,13 @@ export default function BasketPage() {
                 </p>
                 <p className="text-lg font-bold text-gray-900 mt-1">${item.price}</p>
               </div>
+              <button
+                onClick={() => handleRemove(entry.id)}
+                disabled={removingId === entry.id}
+                className="text-sm font-semibold text-red-500 hover:text-red-600 disabled:opacity-50 px-3 py-1.5 rounded-lg border border-red-200 hover:border-red-300 transition-colors"
+              >
+                {removingId === entry.id ? 'Removing...' : 'Remove'}
+              </button>
             </div>
           )
         })}
