@@ -17,10 +17,10 @@ export function CategoryTabs({
           <button
             key={cat}
             onClick={() => onChange(cat)}
-            className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold font-display transition-all ${
+            className={`whitespace-nowrap rounded-full px-[15px] py-2 text-[12.5px] font-bold font-display transition-colors ${
               isActive
-                ? 'bg-[#FF5A1F] text-white shadow-sm shadow-orange-200'
-                : 'bg-[#FFE8D6] text-[#8A5A3A] hover:bg-[#FFDCC0]'
+                ? 'bg-orange text-white'
+                : 'bg-peach text-cocoa hover:bg-[#FFDCC0]'
             }`}
           >
             {cat}

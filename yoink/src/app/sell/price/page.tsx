@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 
 type Draft = {
@@ -80,13 +81,23 @@ export default function SellPricePage() {
   if (!draft) return <p className="text-center py-10">Loading...</p>
 
   return (
-    <main className="min-h-screen bg-[#FFF8F0] flex flex-col items-center px-6 py-10">
-      <h1 className="font-display text-2xl font-bold text-[#1A1A1A] mb-1">
+    <main className="min-h-screen bg-cream flex flex-col items-center px-6 py-10">
+      <div className="w-full max-w-xs mb-4">
+        <Link
+          href="/sell"
+          aria-label="Back"
+          className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-line bg-white text-lg hover:border-orange transition-colors"
+        >
+          ←
+        </Link>
+      </div>
+
+      <h1 className="font-display text-2xl font-bold text-ink mb-1">
         How&apos;s this leaving your hands?
       </h1>
 
       <div className="w-full max-w-xs mt-6">
-        <div className="rounded-2xl overflow-hidden border-2 border-[#EFE6D8] mb-5">
+        <div className="rounded-2xl overflow-hidden border-2 border-line mb-5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={draft.photoPreview} alt="Your item" className="w-full aspect-square object-cover" />
         </div>
@@ -96,8 +107,8 @@ export default function SellPricePage() {
             onClick={() => setMode('sell')}
             className={`flex-1 py-3 rounded-2xl font-display font-bold transition-colors ${
               mode === 'sell'
-                ? 'bg-[#FF5A1F] text-white'
-                : 'bg-white border-2 border-[#EFE6D8] text-[#1A1A1A]'
+                ? 'bg-orange text-white'
+                : 'bg-white border-2 border-line text-ink'
             }`}
           >
             Sell it 💰
@@ -106,41 +117,41 @@ export default function SellPricePage() {
             onClick={() => setMode('yoink')}
             className={`flex-1 py-3 rounded-2xl font-display font-bold transition-colors ${
               mode === 'yoink'
-                ? 'bg-[#00C2A8] text-white'
-                : 'bg-white border-2 border-[#EFE6D8] text-[#1A1A1A]'
+                ? 'bg-mint text-white'
+                : 'bg-white border-2 border-line text-ink'
             }`}
           >
             Yoink it 🎁
           </button>
         </div>
 
-        <label className="text-xs font-semibold text-[#8A8578]">Title</label>
+        <label className="text-xs font-semibold text-muted">Title</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g. Rice Cooker"
-          className="w-full rounded-xl border-2 border-[#EFE6D8] px-3 py-2.5 text-sm font-medium mb-3 mt-1 outline-none focus:border-[#FF5A1F]"
+          className="w-full rounded-xl border-2 border-line px-3 py-2.5 text-sm font-medium mb-3 mt-1 outline-none focus:border-orange"
         />
 
-        <label className="text-xs font-semibold text-[#8A8578]">Description</label>
+        <label className="text-xs font-semibold text-muted">Description</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Any details buyers should know"
           rows={3}
-          className="w-full rounded-xl border-2 border-[#EFE6D8] px-3 py-2.5 text-sm font-medium mb-3 mt-1 outline-none focus:border-[#FF5A1F]"
+          className="w-full rounded-xl border-2 border-line px-3 py-2.5 text-sm font-medium mb-3 mt-1 outline-none focus:border-orange"
         />
 
         {mode === 'sell' && (
           <>
-            <label className="text-xs font-semibold text-[#8A8578]">Price ($)</label>
+            <label className="text-xs font-semibold text-muted">Price ($)</label>
             <input
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="12"
-              className="w-full rounded-xl border-2 border-[#EFE6D8] px-3 py-2.5 text-sm font-bold mb-4 mt-1 outline-none focus:border-[#FF5A1F]"
+              className="w-full rounded-xl border-2 border-line px-3 py-2.5 text-sm font-bold mb-4 mt-1 outline-none focus:border-orange"
             />
           </>
         )}
@@ -150,7 +161,7 @@ export default function SellPricePage() {
         <button
           onClick={handlePost}
           disabled={posting}
-          className="w-full bg-[#FF5A1F] text-white rounded-2xl py-3.5 font-display font-bold hover:bg-[#E64A0F] transition-colors disabled:opacity-50"
+          className="yk-shadow-orange w-full bg-orange text-white rounded-2xl py-3.5 font-display font-extrabold transition-transform disabled:opacity-50"
         >
           {posting ? 'Posting...' : 'Post it'}
         </button>

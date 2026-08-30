@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 const CATEGORIES = ['Kitchenware', 'Winter Needs', 'Clothing', 'All']
 const CONDITIONS = ['Like New', 'Good', 'Well Loved']
@@ -59,19 +60,29 @@ export default function SellUploadPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#FFF8F0] flex flex-col items-center px-6 py-10">
-      <h1 className="font-display text-2xl font-bold text-[#1A1A1A] mb-1">
+    <main className="min-h-screen bg-cream flex flex-col items-center px-6 py-10">
+      <div className="w-full max-w-xs mb-4">
+        <Link
+          href="/feed"
+          aria-label="Back to feed"
+          className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-line bg-white text-lg hover:border-orange transition-colors"
+        >
+          ←
+        </Link>
+      </div>
+
+      <h1 className="font-display text-2xl font-bold text-ink mb-1">
         Got something to Yoink?
       </h1>
-      <p className="text-sm text-[#8A8578] mb-8 font-medium">
+      <p className="text-sm text-muted mb-8 font-medium">
         Snap a photo to get started
       </p>
 
       <div className="w-full max-w-xs">
         {!preview ? (
-          <label className="flex flex-col items-center justify-center aspect-square rounded-3xl border-2 border-dashed border-[#EFE6D8] bg-white cursor-pointer hover:border-[#FF5A1F] transition-colors">
+          <label className="flex flex-col items-center justify-center aspect-square rounded-3xl border-2 border-dashed border-line bg-white cursor-pointer hover:border-orange transition-colors">
             <span className="text-4xl mb-2">📷</span>
-            <span className="text-sm font-semibold text-[#8A5A3A]">
+            <span className="text-sm font-semibold text-cocoa">
               Tap to take or choose a photo
             </span>
             <input
@@ -83,14 +94,14 @@ export default function SellUploadPage() {
             />
           </label>
         ) : (
-          <div className="rounded-3xl overflow-hidden border-2 border-[#EFE6D8]">
+          <div className="rounded-3xl overflow-hidden border-2 border-line">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={preview} alt="Your item" className="w-full aspect-square object-cover" />
           </div>
         )}
 
         {analyzing && (
-          <p className="text-center text-sm text-[#B5AD9C] font-medium mt-4">
+          <p className="text-center text-sm text-faint font-medium mt-4">
             Working out what you&apos;re getting rid of... 🔍
           </p>
         )}
@@ -100,19 +111,19 @@ export default function SellUploadPage() {
         )}
 
         {preview && !analyzing && (
-          <div className="mt-5 bg-white rounded-2xl border-2 border-[#EFE6D8] p-4">
+          <div className="mt-5 bg-white rounded-2xl border-2 border-line p-4">
             {aiResult && (
-              <p className="text-xs font-semibold text-[#00C2A8] mb-3">
+              <p className="text-xs font-semibold text-mint mb-3">
                 AI thinks this is a: <span className="font-bold">{aiResult.label}</span>{' '}
                 ({Math.round(aiResult.confidence * 100)}% confident)
               </p>
             )}
 
-            <label className="text-xs font-semibold text-[#8A8578]">Category</label>
+            <label className="text-xs font-semibold text-muted">Category</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-xl border-2 border-[#EFE6D8] px-3 py-2 text-sm font-medium mb-3 mt-1 outline-none focus:border-[#FF5A1F]"
+              className="w-full rounded-xl border-2 border-line px-3 py-2 text-sm font-medium mb-3 mt-1 outline-none focus:border-orange"
             >
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
@@ -121,11 +132,11 @@ export default function SellUploadPage() {
               ))}
             </select>
 
-            <label className="text-xs font-semibold text-[#8A8578]">Condition</label>
+            <label className="text-xs font-semibold text-muted">Condition</label>
             <select
               value={condition}
               onChange={(e) => setCondition(e.target.value)}
-              className="w-full rounded-xl border-2 border-[#EFE6D8] px-3 py-2 text-sm font-medium mb-4 mt-1 outline-none focus:border-[#FF5A1F]"
+              className="w-full rounded-xl border-2 border-line px-3 py-2 text-sm font-medium mb-4 mt-1 outline-none focus:border-orange"
             >
               {CONDITIONS.map((c) => (
                 <option key={c} value={c}>
@@ -147,7 +158,7 @@ export default function SellUploadPage() {
                 )
                 router.push('/sell/price')
               }}
-              className="w-full bg-[#FF5A1F] text-white rounded-2xl py-3 font-display font-bold hover:bg-[#E64A0F] transition-colors"
+              className="yk-shadow-orange w-full bg-orange text-white rounded-2xl py-3 font-display font-extrabold transition-transform"
             >
               Continue
             </button>

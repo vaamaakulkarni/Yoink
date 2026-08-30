@@ -1,27 +1,75 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=Instrument+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
-:root {
-  --cream: #FFF8F0;
-  --ink: #1A1A1A;
-  --orange: #FF5A1F;
-  --orange-dark: #E64A0F;
-  --peach: #FFE8D6;
-  --mint: #00C2A8;
-  --border: #EFE6D8;
+@theme {
+  /* Colour — unchanged values, new names for the three greys */
+  --color-cream:        #FFF8F0;  /* page background */
+  --color-ink:          #1A1A1A;  /* body text */
+  --color-orange:       #FF5A1F;  /* price, primary action */
+  --color-orange-dark:  #E64A0F;  /* button underside + hover only */
+  --color-mint:         #00C2A8;  /* free, accepted, verified, proximity */
+  --color-mint-dark:    #00806F;  /* mint text on tinted backgrounds */
+  --color-peach:        #FFE8D6;  /* chips, secondary fills */
+  --color-cocoa:        #8A5A3A;  /* text on peach */
+  --color-line:         #EFE6D8;  /* every 2px border */
+  --color-muted:        #8A8578;  /* secondary text */
+  --color-faint:        #B5AD9C;  /* placeholder, timestamps */
+
+  /* Type */
+  --font-display: 'Gabarito', system-ui, sans-serif;
+  --font-sans:    'Instrument Sans', system-ui, sans-serif;
+  --font-mono:    'DM Mono', ui-monospace, monospace;
+
+  /* Radii — unchanged from the current app */
+  --radius-chip: 9999px;
+  --radius-input: 16px;
+  --radius-card: 24px;
 }
 
 body {
-  background: var(--cream);
-  color: var(--ink);
-  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  /* Confetti texture: four specks on an 80px tile, all under 18% alpha.
+     Only visible in gutters — every card is opaque white. */
+  background-color: var(--color-cream);
+  background-image:
+    radial-gradient(circle at 14px 20px, rgba(255, 90, 31, .15)  2.2px, transparent 2.6px),
+    radial-gradient(circle at 52px 46px, rgba(0, 194, 168, .18)  2.2px, transparent 2.6px),
+    radial-gradient(circle at 32px 64px, rgba(138, 90, 58, .13)  2.6px, transparent 3px),
+    radial-gradient(circle at 68px 12px, rgba(138, 90, 58, .10)  1.8px, transparent 2.2px);
+  background-size: 80px 80px;
+  background-attachment: fixed;
 }
 
-.font-display {
-  font-family: 'Space Grotesk', sans-serif;
+.font-display { font-family: var(--font-display); }
+
+::selection { background: var(--color-orange); color: white; }
+
+/* Card hover — the ONLY blurred shadow in the app */
+.yk-card {
+  transition: transform .18s cubic-bezier(.2, .9, .3, 1.4), box-shadow .18s;
+}
+.yk-card:hover {
+  transform: translateY(-4px) rotate(-.6deg);
+  box-shadow: 0 10px 24px rgba(255, 90, 31, .14);
+}
+@media (prefers-reduced-motion: reduce) {
+  .yk-card { transition: none; }
+  .yk-card:hover { transform: none; }
 }
 
-::selection {
-  background: var(--orange);
-  color: white;
+/* Flat offset shadow for primary buttons — no blur */
+.yk-shadow-orange { box-shadow: 0 4px 0 var(--color-orange-dark); }
+.yk-shadow-mint { box-shadow: 0 4px 0 #00A28C; }
+.yk-shadow-orange:active, .yk-shadow-mint:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--color-orange-dark);
 }
+.yk-shadow-mint:active { box-shadow: 0 2px 0 #00A28C; }
+@media (prefers-reduced-motion: reduce) {
+  .yk-shadow-orange, .yk-shadow-mint { transition: none; }
+}
+
+/* Hide the native scrollbar in the chat thread and category rail */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
