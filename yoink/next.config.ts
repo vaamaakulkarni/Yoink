@@ -1,3 +1,6 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  allowedDevOrigins: ['10.19.149.11'],
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -6,4 +9,4 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ['10.19.66.187'],
 };
 
-export default nextConfig;
+module.exports = nextConfig;
