@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
-import { DORMS } from '@/lib/dorms'
+import { DORMS, type Dorm } from '@/lib/dorms'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [university, setUniversity] = useState('University of Sydney')
-  const [dorm, setDorm] = useState(DORMS[0])
+  const [dorm, setDorm] = useState<Dorm>(DORMS[0])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -95,7 +95,7 @@ export default function SignupPage() {
 
         <select
           value={dorm}
-          onChange={(e) => setDorm(e.target.value)}
+          onChange={(e) => setDorm(e.target.value as Dorm)}
           className="rounded-2xl border-2 border-[#EFE6D8] px-4 py-3 text-sm font-semibold text-[#8A5A3A] outline-none focus:border-[#FF5A1F]"
         >
           {DORMS.map((d) => (

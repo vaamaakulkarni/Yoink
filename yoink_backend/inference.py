@@ -87,10 +87,8 @@ def estimate_condition(clip_model, clip_preprocess, image: Image.Image):
     }
 
 
-def classify_item(image_path: str, resnet_model, resnet_classes, clip_model, clip_preprocess):
-    """Classify an item, then estimate its condition from the same image."""
-    image = Image.open(image_path)
-
+def analyze_image(image: Image.Image, resnet_model, resnet_classes, clip_model, clip_preprocess):
+    """Classify an already-opened image and estimate its condition."""
     resnet_label, resnet_confidence = classify_with_resnet(resnet_model, resnet_classes, image)
 
     if resnet_confidence >= CONFIDENCE_THRESHOLD:
@@ -114,6 +112,12 @@ def classify_item(image_path: str, resnet_model, resnet_classes, clip_model, cli
     # always classification -> condition estimation, even when CLIP is the fallback.
     classification["condition"] = estimate_condition(clip_model, clip_preprocess, image)
     return classification
+
+
+def classify_item(image_path: str, resnet_model, resnet_classes, clip_model, clip_preprocess):
+    """Classify an image file; retained for scripts and command-line use."""
+    with Image.open(image_path) as image:
+        return analyze_image(image, resnet_model, resnet_classes, clip_model, clip_preprocess)
 
 
 def main():

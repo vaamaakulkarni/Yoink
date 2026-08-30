@@ -6,27 +6,41 @@ import Link from 'next/link'
 
 const CATEGORIES = ['Kitchenware', 'Winter Needs', 'Clothing', 'All']
 const CONDITIONS = ['Like New', 'Good', 'Well Loved']
+const ML_API_URL = process.env.NEXT_PUBLIC_ML_API_URL ?? 'http://localhost:8000'
 
-// Calls the real ML model running separately at localhost:8000.
-// See yoink_backend/server.py for how to start that server.
-async function classifyImage(file: File): Promise<{
+type AnalysisResult = {
   label: string
   confidence: number
   source: string
-}> {
+  condition: {
+    label: string
+    confidence: number
+    new_score: number
+  }
+}
+
+// Calls the real ML model running separately at localhost:8000.
+// See yoink_backend/server.py for how to start that server.
+async function analyzeImage(file: File): Promise<AnalysisResult> {
   const formData = new FormData()
   formData.append('file', file)
 
-  const response = await fetch('http://localhost:8000/classify', {
+  const response = await fetch(`${ML_API_URL}/analyze`, {
     method: 'POST',
     body: formData,
   })
 
   if (!response.ok) {
-    throw new Error('Classification server not reachable — is it running?')
+    throw new Error('Analysis server not reachable — is it running?')
   }
 
   return response.json()
+}
+
+function suggestedCondition(label: string): string {
+  if (label.includes('brand new')) return 'Like New'
+  if (label.includes('gently used')) return 'Good'
+  return 'Well Loved'
 }
 
 export default function SellUploadPage() {
@@ -34,7 +48,7 @@ export default function SellUploadPage() {
   const [preview, setPreview] = useState<string | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [analyzeError, setAnalyzeError] = useState<string | null>(null)
-  const [aiResult, setAiResult] = useState<{ label: string; confidence: number } | null>(null)
+  const [aiResult, setAiResult] = useState<AnalysisResult | null>(null)
   const [category, setCategory] = useState(CATEGORIES[0])
   const [condition, setCondition] = useState(CONDITIONS[0])
 
@@ -48,11 +62,12 @@ export default function SellUploadPage() {
     setAiResult(null)
 
     try {
-      const result = await classifyImage(file)
-      setAiResult({ label: result.label, confidence: result.confidence })
+      const result = await analyzeImage(file)
+      setAiResult(result)
+      setCondition(suggestedCondition(result.condition.label))
     } catch (err) {
       setAnalyzeError(
-        'Could not reach the AI classifier — you can still fill this in manually below.'
+        'Could not reach the AI analysis server — you can still fill this in manually below.'
       )
     } finally {
       setAnalyzing(false)
@@ -113,10 +128,16 @@ export default function SellUploadPage() {
         {preview && !analyzing && (
           <div className="mt-5 bg-white rounded-2xl border-2 border-line p-4">
             {aiResult && (
-              <p className="text-xs font-semibold text-mint mb-3">
-                AI thinks this is a: <span className="font-bold">{aiResult.label}</span>{' '}
-                ({Math.round(aiResult.confidence * 100)}% confident)
-              </p>
+              <div className="mb-3 space-y-1 text-xs font-semibold">
+                <p className="text-mint">
+                  AI thinks this is a: <span className="font-bold">{aiResult.label}</span>{' '}
+                  ({Math.round(aiResult.confidence * 100)}% confident)
+                </p>
+                <p className="text-muted">
+                  Condition suggestion: <span className="font-bold">{suggestedCondition(aiResult.condition.label)}</span>{' '}
+                  ({Math.round(aiResult.condition.confidence * 100)}% confident). Please confirm it below.
+                </p>
+              </div>
             )}
 
             <label className="text-xs font-semibold text-muted">Category</label>
@@ -153,6 +174,7 @@ export default function SellUploadPage() {
                     category,
                     condition,
                     ai_tag: aiResult?.label ?? null,
+                    condition_score: aiResult?.condition.new_score ?? null,
                     photoPreview: preview,
                   })
                 )
